@@ -57,7 +57,7 @@ module maze
     [place] true -> 1/3:(x'=3)&(y'=2) + 1/3:(x'=6)&(y'=2) + 1/3:(x'=8)&(y'=2);
 
     // (DEBUG) deterministic placement
-    // [place] true -> (x'=7)&(y'=5);
+    //[place] true -> (x'=3)&(y'=2);
 
     // moving in the direction selected by the controller
     [drive] dir=up    -> 0.9: (y'=yu) + 0.1: (x'=xl);
@@ -72,16 +72,53 @@ module controller
     dir : [0..3];
 
     // sample strategy 1: alternate between steering down and left
-    // steering_down : bool init false;
-    // [steer] steering_down -> (dir'=down) & (steering_down'=false);
-    // [steer] !steering_down -> (dir'=left) & (steering_down'=true);
+    //steering_down : bool init false;
+    //[steer] steering_down -> (dir'=down) & (steering_down'=false);
+    //[steer] !steering_down -> (dir'=left) & (steering_down'=true);
 
     // sample strategy 2: steer up if possible, otherwise steer randomly left/right
-    // [steer] u -> (dir'=up);
-    // [steer] !u -> 1/2:(dir'=left) + 1/2:(dir'=right);
+    //[steer] u -> (dir'=up);
+    //[steer] !u -> 1/2:(dir'=left) + 1/2:(dir'=right);
 
-    // TODO your strategy
+    // basic strategy
+    //[steer] true -> 1/4:(dir'=left) + 1/4:(dir'=right) + 1/4:(dir'=up) + 1/4:(dir'=down);
 
+    strategy_option : [0..4] init 0;
+
+    // strategy 0: for S(8,2) to E(9,5) -- default strategy
+    [steer] u & strategy_option=0 -> (dir'=up);
+    [steer] !u & r & (l | d) & strategy_option=0 -> (dir'=right);
+
+    // strategy switch according to place (6,4) from strategy 0 to strategy 1
+    [steer] !u & !r & !l & strategy_option=0 -> (dir'=down) & (strategy_option'=1);
+
+    // strategy 1: for S(6,2) to place (7,2) with strategy switch to 0
+    [steer] !r & strategy_option=1 -> (dir'=down);
+    [steer] u & r & strategy_option=1 -> (dir'=right);
+    [steer] !u & r & strategy_option=1 -> (dir'=right) & (strategy_option'=0);
+
+    // strategy switch according to place (3,4) from strategy 0 to strategy 2
+    [steer] !u & !r & l & strategy_option=0 -> (dir'=left) & (strategy_option'=2);
+
+    // strategy 2: for S(3,2) to place (0,4)
+    [steer] u & strategy_option=2 -> (dir'=up);
+    [steer] !u & l & strategy_option=2 -> (dir'=left);
+
+    // strategy switch according to place (0,4) from strategy 2 to strategy 3
+    [steer] !u & !l & strategy_option=2 -> (dir'=down) & (strategy_option'=3);
+
+    // strategy 3: for S(3,2) from place (0,4) to E(0,1)
+    [steer] d & strategy_option=3 -> (dir'=down);
+    [steer] !d & strategy_option=3 -> (dir'=left);
+
+    // strategy switch according to place (2,2) from strategy 0 to strategy 4
+    [steer] !u & r & !l & !d & strategy_option=0 -> (dir'=right) & (strategy_option'=4);
+
+    // strategy 4: for S(3,2) to E(0,1)
+    [steer] d & strategy_option=4 -> (dir'=down);
+    [steer] !d & l & strategy_option=4 -> (dir'=left);
+    [steer] !d & !l & u & strategy_option=4 -> (dir'=up);
+    [steer] !d & !l & !u & strategy_option=4 -> (dir'=right);
 endmodule
 
 rewards "steps"

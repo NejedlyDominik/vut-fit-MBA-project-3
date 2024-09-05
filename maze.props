@@ -1,0 +1,14 @@
+P=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ]
+
+P>=1 [ F ((x=0)&(y=1))|((x=9)&(y=5)) ]
+
+R{"steps"}=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ]
+
+R{"steps"}<=8.4 [ F ((x=0)&(y=1))|((x=9)&(y=5)) ]
+
+filter(first, R{"steps"}=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ], (x=8)&(y=2)&(strategy_option=0))
+
+filter(first, R{"steps"}=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ], (x=6)&(y=2)&(strategy_option=0))
+
+filter(first, R{"steps"}=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ], (x=3)&(y=2)&(strategy_option=0))
+

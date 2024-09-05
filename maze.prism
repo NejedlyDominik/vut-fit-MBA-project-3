@@ -43,6 +43,8 @@ const int right = 1;
 const int down = 2;
 const int left = 3;
 
+const double successful_move_probabilty = 0.9;
+
 // macros encoding movement in the selected direction or bumping into a wall
 formula yu = u ? (y+1) : y;
 formula xr = r ? (x+1) : x;
@@ -60,16 +62,16 @@ module maze
     //[place] true -> (x'=3)&(y'=2);
 
     // moving in the direction selected by the controller
-    [drive] dir=up    -> 0.9: (y'=yu) + 0.1: (x'=xl);
-    [drive] dir=right -> 0.9: (x'=xr) + 0.1: (y'=yu);
-    [drive] dir=down  -> 0.9: (y'=yd) + 0.1: (x'=xr);
-    [drive] dir=left  -> 0.9: (x'=xl) + 0.1: (y'=yd);
+    [drive] dir=up    -> successful_move_probabilty: (y'=yu) + (1 - successful_move_probabilty): (x'=xl);
+    [drive] dir=right -> successful_move_probabilty: (x'=xr) + (1 - successful_move_probabilty): (y'=yu);
+    [drive] dir=down  -> successful_move_probabilty: (y'=yd) + (1 - successful_move_probabilty): (x'=xr);
+    [drive] dir=left  -> successful_move_probabilty: (x'=xl) + (1 - successful_move_probabilty): (y'=yd);
 endmodule
 
 
 module controller
     // steering direction
-    dir : [0..3];
+    dir : [0..3] init 0;
 
     // sample strategy 1: alternate between steering down and left
     //steering_down : bool init false;
@@ -80,7 +82,7 @@ module controller
     //[steer] u -> (dir'=up);
     //[steer] !u -> 1/2:(dir'=left) + 1/2:(dir'=right);
 
-    // basic strategy
+    // basic random strategy
     //[steer] true -> 1/4:(dir'=left) + 1/4:(dir'=right) + 1/4:(dir'=up) + 1/4:(dir'=down);
 
     strategy_option : [0..4] init 0;

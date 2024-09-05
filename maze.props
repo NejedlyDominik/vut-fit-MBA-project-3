@@ -1,14 +1,39 @@
-P=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ]
+const int number_of_steps;
 
-P>=1 [ F ((x=0)&(y=1))|((x=9)&(y=5)) ]
+label "start_1" = x=3&y=2;
+label "start_2" = x=6&y=2;
+label "start_3" = x=8&y=2;
 
-R{"steps"}=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ]
+P=? [ F exit ]
 
-R{"steps"}<=8.4 [ F ((x=0)&(y=1))|((x=9)&(y=5)) ]
+P>=1 [ F exit ]
 
-filter(first, R{"steps"}=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ], (x=8)&(y=2)&(strategy_option=0))
+R{"steps"}=? [ F exit ]
 
-filter(first, R{"steps"}=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ], (x=6)&(y=2)&(strategy_option=0))
+R{"steps"}<=8.4 [ F exit ]
 
-filter(first, R{"steps"}=? [ F ((x=0)&(y=1))|((x=9)&(y=5)) ], (x=3)&(y=2)&(strategy_option=0))
+filter(first, R{"steps"}=? [ F exit ], "start_1")
+
+filter(first, R{"steps"}=? [ F exit ], "start_2")
+
+filter(first, R{"steps"}=? [ F exit ], "start_3")
+
+// (2 * number_of_steps + 1) transfer steps done in maze to the number of executed commands
+// in model (as there is intial random selection of starting cell and steering and driving moves alternate)
+P=? [ F<=(2*number_of_steps+1) exit ]
+
+filter(first, P=? [ F<=(2*number_of_steps) exit ], "start_1")
+
+filter(first, P=? [ F<=(2*number_of_steps) exit ], "start_2")
+
+filter(first, P=? [ F<=(2*number_of_steps) exit ], "start_3")
+
+// for the density function it is necessary to taking into account just cases with the first occurence of exit
+P=? [ !exit U=(2*number_of_steps+1) exit ]
+
+filter(first, P=? [ !exit U=(2*number_of_steps) exit ], "start_1")
+
+filter(first, P=? [ !exit U=(2*number_of_steps) exit ], "start_2")
+
+filter(first, P=? [ !exit U=(2*number_of_steps) exit ], "start_3")
 

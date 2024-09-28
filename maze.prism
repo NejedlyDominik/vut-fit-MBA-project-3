@@ -43,7 +43,7 @@ const int right = 1;
 const int down = 2;
 const int left = 3;
 
-const double successful_move_probabilty = 0.9;
+const double succ_move_prob = 0.9;
 
 // macros encoding movement in the selected direction or bumping into a wall
 formula yu = u ? (y+1) : y;
@@ -55,17 +55,17 @@ module maze
     x : [-1..12];
     y : [-1..5];
 
-    // random placement
+    // random initial placement
     [place] true -> 1/3:(x'=3)&(y'=2) + 1/3:(x'=6)&(y'=2) + 1/3:(x'=8)&(y'=2);
 
     // (DEBUG) deterministic placement
     //[place] true -> (x'=3)&(y'=2);
 
     // moving in the direction selected by the controller
-    [drive] dir=up    -> successful_move_probabilty: (y'=yu) + (1 - successful_move_probabilty): (x'=xl);
-    [drive] dir=right -> successful_move_probabilty: (x'=xr) + (1 - successful_move_probabilty): (y'=yu);
-    [drive] dir=down  -> successful_move_probabilty: (y'=yd) + (1 - successful_move_probabilty): (x'=xr);
-    [drive] dir=left  -> successful_move_probabilty: (x'=xl) + (1 - successful_move_probabilty): (y'=yd);
+    [drive] dir=up    -> succ_move_prob: (y'=yu) + (1 - succ_move_prob): (x'=xl);
+    [drive] dir=right -> succ_move_prob: (x'=xr) + (1 - succ_move_prob): (y'=yu);
+    [drive] dir=down  -> succ_move_prob: (y'=yd) + (1 - succ_move_prob): (x'=xr);
+    [drive] dir=left  -> succ_move_prob: (x'=xl) + (1 - succ_move_prob): (y'=yd);
 endmodule
 
 
